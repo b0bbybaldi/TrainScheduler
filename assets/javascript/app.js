@@ -1,7 +1,14 @@
 
 // 1. Initialize Firebase
-//var config = {
-
+var config = {
+  apiKey: "AIzaSyCoRiGswj2VemLHtIaU_8MFWP3dmAAOLvs",
+  authDomain: "trainscheduler-dce9d.firebaseapp.com",
+  databaseURL: "https://trainscheduler-dce9d.firebaseio.com",
+  projectId: "trainscheduler-dce9d",
+  storageBucket: "",
+  messagingSenderId: "589296495761"
+};
+firebase.initializeApp(config);
 
 var database = firebase.database();
 
@@ -12,24 +19,24 @@ $("#add-traub-btn").on("click", function(event) {
   // Grabs user input
   var tName = $("#train-name-input").val().trim();
   var tDestination = $("#destination-input").val().trim();
-  var tStart = moment($("#firstTrainTime-input").val().trim(), "DD/MM/YY").format("X");
+  var tFirst = moment($("#firstTrainTime-input").val().trim(), "DD/MM/YY").format("X");
   var tFrequency = $("#frequency-input").val().trim();
 
-  // Creates local "temporary" object for holding employee data
+  // Creates local "temporary" object for holding train data
   var newTrain = {
     name: tName,
     destination: tDestination,
-    start: tStart,
-    frqeuency: tFrequency
+    first: tFirst,
+    frequency: tFrequency
   };
 
-  // Uploads employee data to the database
+  // Uploads train data to the database
   database.ref().push(newTrain);
 
   // Logs everything to console
   console.log(newTrain.name);
   console.log(newTrain.destination);
-  console.log(newTrain.start);
+  console.log(newTrain.first);
   console.log(newTrain.frequency);
 
   // Alert
@@ -51,28 +58,25 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
   // Store everything into a variable.
   var tName = childSnapshot.val().name;
   var tDestinaton = childSnapshot.val().destination;
-  var tStart = childSnapshot.val().start;
+  var tStart = childSnapshot.val().first;
   var tFrequency = childSnapshot.val().frequency;
 
   // Employee Info
   console.log(tName);
   console.log(tDestination);
-  console.log(tStart);
+  console.log(tFirst);
   console.log(tFrequency);
 
-  // Prettify the employee start
-  var trainStartPretty = moment.unix(tStart).format("MM/DD/YY");
+  // Prettify the next train time
+  var trainETAPretty = roundup(moment().diff(moment.unix(tFirst, "X"), "hours")/tFrequency, 0) + moment.unix(tFirst, "X"), "hours";
 
-  // Calculate the months worked using hardcore math
-  // To calculate the months worked
-  var trainMonths = moment().diff(moment.unix(tStart, "X"), "months");
-  console.log(trainMonths);
+// .format("HH:mm") ;
 
-  // Calculate the total billed rate
-  var tBilled = trainMonths * tFrequency;
-  console.log(tBilled);
+  // Calculate the time for next train ETA using hardcore math
+  var nextTrain = moment().diff(moment.unix(trainETAPretty, "X"), "minutes");
+  console.log(nextTrain);
 
   // Add each train's data into the table
   $("#train-table > tbody").append("<tr><td>" + tName + "</td><td>" + tDestination + "</td><td>" +
-  trainStartPretty + "</td><td>" + trainMonths + "</td><td>" + tFrequency + "</td><td>" + tBilled + "</td></tr>");
+  tFrequency + "</td><td>" + trainETAPretty + "</td><td>" + nextTrain + "</td></tr>");
 });
