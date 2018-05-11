@@ -13,13 +13,13 @@ firebase.initializeApp(config);
 var database = firebase.database();
 
 // 2. Button for adding Trains
-$("#add-traub-btn").on("click", function(event) {
+$("#add-train-btn").on("click", function(event) {
   event.preventDefault();
 
   // Grabs user input
   var tName = $("#train-name-input").val().trim();
   var tDestination = $("#destination-input").val().trim();
-  var tFirst = moment($("#firstTrainTime-input").val().trim(), "DD/MM/YY").format("X");
+  var tFirst = $("#first-train-input").val().trim();
   var tFrequency = $("#frequency-input").val().trim();
 
   // Creates local "temporary" object for holding train data
@@ -45,7 +45,7 @@ $("#add-traub-btn").on("click", function(event) {
   // Clears all of the text-boxes
   $("#train-name-input").val("");
   $("#destination-input").val("");
-  $("#firstTrainTime-input").val("");
+  $("#first-train-input").val("");
   $("#frequency-input").val("");
 
 });
@@ -57,8 +57,8 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
 
   // Store everything into a variable.
   var tName = childSnapshot.val().name;
-  var tDestinaton = childSnapshot.val().destination;
-  var tStart = childSnapshot.val().first;
+  var tDestination = childSnapshot.val().destination;
+  var tFirst = childSnapshot.val().first;
   var tFrequency = childSnapshot.val().frequency;
 
   // Employee Info
@@ -67,14 +67,23 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
   console.log(tFirst);
   console.log(tFrequency);
 
-  // Prettify the next train time
-  var trainETAPretty = roundup(moment().diff(moment.unix(tFirst, "X"), "hours")/tFrequency, 0) + moment.unix(tFirst, "X"), "hours";
-
-// .format("HH:mm") ;
+  // Prettify the first train time
+  
+  var initial = moment(tFirst, "HH:mm");
 
   // Calculate the time for next train ETA using hardcore math
-  var nextTrain = moment().diff(moment.unix(trainETAPretty, "X"), "minutes");
-  console.log(nextTrain);
+
+  var sinceFirst = moment().diff(initial, "minutes");
+
+  var sinceLast = sinceFirst % tFrequency;
+
+  var nextTrain = tFrequency - sinceLast;
+  console.log(nextTrain)
+  
+  var tillNext = moment().add(nextTrain,"minutes");
+
+  var trainETAPretty = tillNext.format("HH:mm");
+  console.log(trainETAPretty)
 
   // Add each train's data into the table
   $("#train-table > tbody").append("<tr><td>" + tName + "</td><td>" + tDestination + "</td><td>" +
