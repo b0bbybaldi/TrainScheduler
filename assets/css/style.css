@@ -1,0 +1,37 @@
+body{
+	background-image: url("../images/background.jpg");
+}
+
+.jumbotron {
+	opacity: 0.85;
+	background-color: orange; 
+	color: black;
+	border-color: orange;
+	border-radius: 5px;
+}
+
+.panel-primary{
+	opacity: 0.85;
+	background-color: orange; 
+	color: black;
+	border-color: orange;
+	border-radius: 5px;
+}
+
+#add-train-btn{
+	opacity: 0.85;
+	background-color: black; 
+	color: orange;
+	border-color: black;
+	border-radius: 5px;
+}
+
+.panel-primary>.panel-heading{
+	opacity: 0.85;
+	background-color: black; 
+	color: orange;
+	border-color: black;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	border-radius: 5px;
+}
